@@ -54,3 +54,47 @@ func stringToDecimal(t *testing.T, s string) decimal.Decimal {
 	require.NoError(t, err, "failed to convert string to decimal: %s", s)
 	return d
 }
+
+func TestDecimals(t *testing.T) {
+	type testCase struct {
+		input    string
+		expected int32
+	}
+	list := []testCase{
+		{"11", 0},
+		{"11.00", 2},
+		{"0.01", 2},
+		{"0.001", 3},
+		{"0.001000", 6},
+		{"0.000000", 6},
+	}
+	for _, item := range list {
+		input := item.input
+		expected := item.expected
+		d, err := Decimals(item.input)
+		require.NoError(t, err, "failed to get decimals for input: %s", input)
+		require.Equalf(t, expected, d, "expected %v, got %v for input %s", expected, d, input)
+	}
+}
+
+func TestTrimmedDecimals(t *testing.T) {
+	type testCase struct {
+		input    string
+		expected int32
+	}
+	list := []testCase{
+		{"11", 0},
+		{"11.00", 0},
+		{"0.01", 2},
+		{"0.001", 3},
+		{"0.001000", 3},
+		{"0.000000", 0},
+	}
+	for _, item := range list {
+		input := item.input
+		expected := item.expected
+		d, err := TrimmedDecimals(item.input)
+		require.NoError(t, err)
+		require.Equalf(t, expected, d, "expected %v, got %v for input %s", expected, d, input)
+	}
+}
