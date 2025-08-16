@@ -1,9 +1,10 @@
 package quantkit
 
 import (
+	"testing"
+
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestTruncateFloat64(t *testing.T) {
@@ -96,5 +97,35 @@ func TestTrimmedDecimals(t *testing.T) {
 		d, err := TrimmedDecimals(item.input)
 		require.NoError(t, err)
 		require.Equalf(t, expected, d, "expected %v, got %v for input %s", expected, d, input)
+	}
+}
+
+func TestIsZeroString(t *testing.T) {
+	type testCase struct {
+		input    string
+		expected bool
+	}
+	list := []testCase{
+		{"0", true},
+		{"0.00", true},
+		{"0.000", true},
+		{"0.000000", true},
+		{"00000.0", true},
+		{"000.00", true},
+		{"1", false},
+		{"1.00", false},
+		{"-1", false},
+		{"-0.01", false},
+		{"", false},
+		{" ", false},
+		{"0e10", false},      // 科学计数法不支持
+		{"0.000.000", false}, // 非法数字
+	}
+
+	for _, item := range list {
+		input := item.input
+		expected := item.expected
+		result := IsZeroString(input)
+		require.Equalf(t, expected, result, "expected %v, got %v for input %s", expected, result, input)
 	}
 }

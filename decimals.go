@@ -1,9 +1,10 @@
 package quantkit
 
 import (
-	"github.com/shopspring/decimal"
 	"strconv"
 	"strings"
+
+	"github.com/shopspring/decimal"
 )
 
 func FormatFloatWithDecimals(f float64, decimals int) string {
@@ -75,4 +76,35 @@ func TrimmedDecimals(s string) (int32, error) {
 
 	parts := strings.SplitN(s, ".", 2)
 	return int32(len(parts[1])), nil
+}
+
+// IsZeroString checks whether a string represents zero, such as "0" or "0.00000".
+// Returns true for strings like "0", "0.0", "0.000", etc.
+// Returns false for empty strings, strings with spaces, or non-zero values.
+// Note: Scientific notation (e.g., "0e10") is not supported.
+// 判断字符串是否为0或0.00000等形式的数字。不支持科学计数法（如 "0e10"）的情况。
+//
+// "0" => true
+// "0.00000" => true
+// "00000.0" => true
+// "000.00" => true
+// "" => false
+// " " => false
+// "0.00.000" => false
+func IsZeroString(s string) bool {
+	if len(s) == 0 {
+		return false
+	}
+	if s == "0" {
+		return true
+	}
+	trimmed := strings.TrimRight(s, "0")
+	if trimmed == "0." {
+		return true
+	}
+	trimmed = strings.TrimLeft(trimmed, "0")
+	if trimmed == "" || trimmed == "." {
+		return true
+	}
+	return false
 }
